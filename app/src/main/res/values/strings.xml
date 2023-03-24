@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">aulasCM</string>
+    <string name="app_name">AulasCm</string>
+    <string name="submit">Submeter</string>
+    <string name="cancel">Cancelar</string>
 </resources>
