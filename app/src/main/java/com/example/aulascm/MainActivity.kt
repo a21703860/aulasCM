@@ -4,7 +4,10 @@ import android.content.ContentValues
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.MenuItem
 import android.view.View
+import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.core.view.GravityCompat
 import com.example.aulascm.databinding.ActivityMainBinding
 import net.objecthunter.exp4j.ExpressionBuilder
 
@@ -17,71 +20,57 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        if(!screenRotated(savedInstanceState)) {
+            NavigationManager.goToCalculatorFragment(supportFragmentManager)
+        }
     }
 
     override fun onStart() {
         super.onStart()
-
-        binding.button1.setOnClickListener{ addSymbol("1", "Click no botão 1") }
-        binding.button2.setOnClickListener{ addSymbol("2", "Click no botão 2") }
-        binding.button3.setOnClickListener{ addSymbol("3", "Click no botão 3") }
-        binding.button4.setOnClickListener{ addSymbol("4", "Click no botão 4") }
-        binding.button5.setOnClickListener{ addSymbol("5", "Click no botão 5") }
-        binding.button6.setOnClickListener{ addSymbol("6", "Click no botão 6") }
-        binding.button7.setOnClickListener{ addSymbol("7", "Click no botão 7") }
-        binding.button8.setOnClickListener{ addSymbol("8", "Click no botão 8") }
-        binding.button9.setOnClickListener{ addSymbol("9", "Click no botão 9") }
-        binding.buttonAdition.setOnClickListener(addOperation("+","Click no botão +"))
-        binding.buttonX.setOnClickListener(addOperation("*","Click no botão X"))
-        binding.buttonMinus.setOnClickListener(addOperation("-","Click no botão -"))
-        binding.buttonPoint.setOnClickListener(addOperation(".","Click no botão ."))
-        binding.buttonEquals.setOnClickListener(equals())
-        binding.buttonBack.setOnClickListener(backspace())
-        binding.buttonClean.setOnClickListener(clear())
+        setSupportActionBar(binding.toolbar)
+        setupDrawerMenu()
     }
 
-    fun addSymbol(number: String, logMessage: String){
-        Log.i(TAG, logMessage)
-        if(binding.textVisor.text.toString() == "0") {
-            binding.textVisor.text = number
+    override fun onBackPressed() {
+        if (binding.drawer.isDrawerOpen(GravityCompat.START)) {
+            binding.drawer.closeDrawer(GravityCompat.START)
+        } else if (supportFragmentManager.backStackEntryCount == 1) {
+            finish()
         } else {
-            binding.textVisor.append(number)
-        }
-
-    }
-    fun addOperation(operation: String, logMessage: String): View.OnClickListener {
-        return View.OnClickListener {
-            Log.i(TAG, logMessage)
-            binding.textVisor.append(operation)
+            super.onBackPressed()
         }
     }
 
-    fun equals(): View.OnClickListener {
-        return View.OnClickListener {
-            Log.i(TAG, "Click no botão =")
-            val expression = ExpressionBuilder(
-                binding.textVisor.text.toString()
-            ).build()
-            operations.add(binding.textVisor.text.toString())
-            binding.textVisor.text = expression.evaluate().toString()
-            Log.i(TAG, "O resultado da expressão é ${binding.textVisor.text}")
-        }
+
+    private fun screenRotated(savedInstanceState: Bundle?): Boolean {
+        return savedInstanceState != null
     }
 
-    fun backspace(): View.OnClickListener {
-        return View.OnClickListener {
-            if (operations.size > 0) {
-                binding.textVisor.text = operations.last()
-            } else {
-                binding.textVisor.text = "0";
-            }
+    private fun setupDrawerMenu() {
+        val toggle = ActionBarDrawerToggle(this,
+            binding.drawer, binding.toolbar,
+            R.string.drawer_open, R.string.drawer_close
+        )
+        binding.navDrawer.setNavigationItemSelectedListener{
+            onClickNavigationItem(it)
         }
+        binding.drawer.addDrawerListener(toggle)
+        toggle.syncState()
     }
 
-    fun clear(): View.OnClickListener {
-        return View.OnClickListener {
-            binding.textVisor.text = "0";
+    private fun onClickNavigationItem(item: MenuItem): Boolean {
+        when(item.itemId) {
+            R.id.nav_calculator ->
+                NavigationManager.goToCalculatorFragment(
+                    supportFragmentManager
+                )
+            R.id.nav_history ->
+                NavigationManager.goToHistoryFragment(
+                    supportFragmentManager
+                )
         }
+        binding.drawer.closeDrawer(GravityCompat.START)
+        return true
     }
 }
 
