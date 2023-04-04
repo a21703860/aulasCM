@@ -6,7 +6,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.aulascm.databinding.FragmentCalculatorBinding
 import net.objecthunter.exp4j.ExpressionBuilder
 
@@ -14,6 +16,11 @@ class CalculatorFragment : Fragment() {
     private lateinit var binding: FragmentCalculatorBinding
     val operations: MutableList<String> = mutableListOf()
     private val TAG = MainActivity::class.java.simpleName
+    private val adapter = HistoryAdapter(::onOperationClick)
+
+    private fun onOperationClick(operation: String) {
+        Toast.makeText(context, operation, Toast.LENGTH_LONG).show()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -29,6 +36,8 @@ class CalculatorFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
+        binding.rvHistory?.layoutManager = LinearLayoutManager(requireContext())
+        binding.rvHistory?.adapter = adapter
         requireActivity().title = "Calculadora"
         binding.button0.setOnClickListener {
             Calculator.addSymbol("0")
@@ -85,6 +94,8 @@ class CalculatorFragment : Fragment() {
         }
         binding.buttonEquals.setOnClickListener {
             (Calculator.equals())
+            val history = Calculator.history
+            adapter.updateItems(history)
             showDisplay()
         }
         binding.buttonPlus.setOnClickListener {

@@ -1,4 +1,5 @@
 package com.example.aulascm
+import androidx.recyclerview.widget.LinearLayoutManager
 import net.objecthunter.exp4j.ExpressionBuilder
 
 // Passar para aqui parte do código do CalculatorFragment
